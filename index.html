@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AXIOMA // SYSTEM OVERRIDE</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+      startup: { typeset: false }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.min.js"></script>
+</head>
+<body>
+
+  <header id="sys-header">
+    <div class="sys-logo">AXIOMA<span class="blink">_</span></div>
+    <div class="sys-header-center">
+      <div id="hud-daily"></div>
+      <div class="hud-btns">
+        <button onclick="Engine.switchView('view-polis')" class="hud-btn" title="Dobít energii">⚡</button>
+        <button onclick="Engine.showAchievements()" class="hud-btn" title="Achievements">🏆</button>
+        <button onclick="Engine.showRules()" class="hud-btn" title="Pravidla">?</button>
+        <button onclick="Engine.resetGame()" class="hud-btn hud-btn-danger" title="Tvrdý restart — smaže veškerý progres">↺</button><span id="restart-count" class="hud-restart-count"></span>
+      </div>
+    </div>
+    <div class="sys-resources">
+      <span title="Počet pokusů (Energy)" id="res-hp" class="res-item"></span>
+      <span id="res-level" class="res-item res-level">LVL 0 // GUEST</span>
+      <span title="Zkušenostní body" class="res-item">XP: <strong id="res-xp" class="text-cyan">0</strong></span>
+    </div>
+  </header>
+
+  <main id="app-container">
+
+    <!-- MAPA BLUDIŠTĚ -->
+    <section id="view-map" class="view">
+      <div id="map-xp-bar"></div>
+      <div id="level-up-toast" class="level-up-toast"></div>
+
+      <div class="map-layout">
+        <div class="blueprint-container">
+          <!-- SVG se dynamicky vykreslí přes Engine -->
+          <svg id="blueprint-svg" viewBox="74 125 603 449" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="scan-line"></div>
+        </div>
+        <div id="legend-sidebar" class="legend-sidebar"></div>
+      </div>
+    </section>
+
+    <!-- DETAIL SEKTORU -->
+    <section id="view-region" class="view">
+      <div class="view-header">
+        <h2 id="region-detail-name">SEKTOR</h2>
+        <p class="subtitle">Dostupné bezpečnostní protokoly k prolomení:</p>
+      </div>
+      <button onclick="Engine.switchView('view-map')" class="btn-secondary mb-4">&#60; NÁVRAT NA ZÁKLADNU</button>
+      <div id="region-encounters" class="encounter-list"></div>
+      <button onclick="Engine.switchView('view-map')" class="btn-secondary mt-4">&#60; NÁVRAT NA ZÁKLADNU</button>
+    </section>
+
+    <!-- ARÉNA (SOUBOJ) -->
+    <section id="view-arena" class="view">
+      <div class="sys-panel mb-4" style="display:flex; justify-content:space-between; align-items:center;">
+        <button id="btn-end-connection" class="btn-secondary" onclick="Engine.returnToRegion()">< UKONČIT SPOJENÍ</button>
+
+        <div class="text-right">
+          <div class="text-muted text-sm" id="monster-region">SEKTOR</div>
+          <h3 id="monster-name" class="text-red m-0">FIREWALL</h3>
+          <div class="hp-bar-bg mt-2"><div id="monster-hp-fill" class="hp-bar-fill"></div></div>
+        </div>
+      </div>
+      
+      <div id="arena-training-controls" class="text-center mb-4"></div>
+      <div id="arena-question-container" class="sys-panel"></div>
+      <div id="arena-feedback" class="sys-alert"></div>
+      
+      <div class="mt-4">
+        <button id="btn-next-fight" class="btn-primary w-full" style="display:none;" onclick="Engine.returnToRegion()">> EXTRAHOVAT DATA A POKRAČOVAT</button>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section id="view-achievements" class="view">
+      <div class="view-header">
+        <h2>ACHIEVEMENTS</h2>
+        <p class="subtitle">Záznamy operací systémem evidované.</p>
+      </div>
+      <button onclick="Engine.switchView('view-map')" class="btn-secondary mb-4">&#60; NÁVRAT K PŮDORYSU</button>
+      <div id="ach-grid" class="ach-grid"></div>
+    </section>
+
+    <!-- DOBÍT ENERGII -->
+    <section id="view-polis" class="view">
+      <div class="view-header"><h2>DOBÍT ENERGII</h2></div>
+      <div id="polis-container" class="sys-panel text-center">
+        <p class="text-muted mb-4">Nedostatek energie vede k systémovému uzamčení. Využijte nasbírané XP pro dobití jednoho náboje.</p>
+        <h3 class="text-cyan">Dobít energii (+1 náboj)</h3>
+        <p>Aktuální cena: <strong class="text-red">30 XP</strong> za náboj</p>
+        <button onclick="Engine.buyBypass()" class="btn-primary mt-2">> SINGLE CHARGE (+1 energie)</button>
+      </div>
+      <button onclick="Engine.switchView('view-map')" class="btn-secondary mt-4">< NÁVRAT K PŮDORYSU</button>
+    </section>
+
+  </main>
+
+  <div id="ach-toast" class="ach-toast"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+</body>
+</html>
